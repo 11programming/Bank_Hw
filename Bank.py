@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # 匯入資料
-file_path = '/Users/linjianxun/Desktop/github/vs code/bank_hw/Bank_Hw/Banking Dataset Marketing Targets.csv'
+file_path = r"C:\Users\USER\Desktop\bank\Bank_Hw\Banking Dataset Marketing Targets.csv"
 bank_data = pd.read_csv(file_path, delimiter=';', quotechar='"')
 
 # 資料清理與欄位名稱處理
@@ -99,3 +99,40 @@ plot(bank_data, 'job', 'Job')
 plot(bank_data, 'marital', 'Marital Status')
 plot(bank_data, 'education', 'Education Level')
 plot(bank_data, 'loan', 'Personal Loan')
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+import pandas as pd
+
+# 清理與處理資料
+bank_data = pd.read_csv(r"C:\Users\USER\Desktop\bank\Bank_Hw\Banking Dataset Marketing Targets.csv", delimiter=';', quotechar='"')
+bank_data.columns = bank_data.columns.str.replace('"', '').str.strip()
+bank_data['y'] = bank_data['y'].str.strip('"').map({'yes': 1, 'no': 0})
+bank_data['loan'] = bank_data['loan'].str.strip('"').map({'yes': 1, 'no': 0})
+
+# 移除不需要的欄位
+bank_data.drop(columns=['age_group'], errors='ignore', inplace=True)  # 確保沒有 age_group
+
+# 分割訓練集與測試集
+train_df, test_df = train_test_split(bank_data, test_size=0.3, random_state=42, stratify=bank_data['y'])
+
+# 特徵與目標欄位
+x_train = train_df.drop(columns=['y'], errors='ignore')
+x_test = test_df.drop(columns=['y'], errors='ignore')
+y_train = train_df['y']
+y_test = test_df['y']
+
+# 確保所有資料為數值
+x_train = x_train.apply(pd.to_numeric, errors='coerce').fillna(0)
+x_test = x_test.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+# 訓練羅吉斯回歸模型
+model = LogisticRegression(max_iter=1000)
+model.fit(x_train, y_train)
+
+# 預測測試集並計算準確率
+y_pred = model.predict(x_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"羅吉斯回歸模型測試準確度：{accuracy:.2f}")
