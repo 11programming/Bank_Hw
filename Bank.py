@@ -103,3 +103,21 @@ plot(bank_data, 'marital', 'Marital Status')
 plot(bank_data, 'education', 'Education Level')
 plot(bank_data, 'loan', 'Personal Loan')
 
+# 分割訓練集與測試集
+train_df, test_df = train_test_split(bank_data, test_size=0.3, random_state=42, stratify=bank_data['y'])
+
+# 保留 age, balance, loan 作為特徵
+x_train = train_df[['age', 'balance', 'loan']].select_dtypes(include=[np.number])  # 確保選擇數值型特徵
+y_train = train_df['y']
+x_test = test_df[['age', 'balance', 'loan']].select_dtypes(include=[np.number])  # 確保選擇數值型特徵
+y_test = test_df['y']
+
+# 訓練羅吉斯回歸模型
+model = LogisticRegression(max_iter=1000)
+model.fit(x_train, y_train)
+
+# 預測測試集並計算準確率
+y_pred = model.predict(x_test)
+accuracy = accuracy_score(y_test, y_pred)
+
+print(f"羅吉斯回歸模型測試準確度：{accuracy:.2f}")
