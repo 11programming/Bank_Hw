@@ -63,3 +63,43 @@ def plot_age():
 # 呼叫年齡相關的繪圖函式
 plot_age()
 
+def plot(df, feature, title):
+    # Group by the feature and 'y' to get counts
+    feature_y_counts = df.groupby([feature, 'y']).size().unstack(fill_value=0)
+    
+    # Setting up the plot for side-by-side bars
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # Define bar width and positions
+    bar_width = 0.35
+    index = np.arange(len(feature_y_counts.index))
+
+    # Plotting separate bars for 'no' and 'yes'
+    ax.barh(index, feature_y_counts[0], bar_width, label='no', color='#A7C7E7')
+    ax.barh(index + bar_width, feature_y_counts[1], bar_width, label='yes', color='#FF6F61')
+
+    # Adding labels and title
+    plt.title(f"Count of y by {title}")
+    plt.xlabel("Count")
+    plt.ylabel(title)
+    plt.yticks(index + bar_width / 2, feature_y_counts.index)  # Center the labels between the bars
+
+    # Add annotations for each bar
+    for i, category in enumerate(feature_y_counts.index):
+        # Annotate 'no' bar
+        ax.text(feature_y_counts.loc[category, 0] + 5, i, str(feature_y_counts.loc[category, 0]), 
+                ha='left', va='center', color='black')
+        
+        # Annotate 'yes' bar
+        ax.text(feature_y_counts.loc[category, 1] + 5, i + bar_width, str(feature_y_counts.loc[category, 1]), 
+                ha='left', va='center', color='black')
+        
+    plt.legend(title='y')
+    plt.show()
+
+# 繪製其他特徵的視覺化
+plot(bank_data, 'job', 'Job')
+plot(bank_data, 'marital', 'Marital Status')
+plot(bank_data, 'education', 'Education Level')
+plot(bank_data, 'loan', 'Personal Loan')
+
